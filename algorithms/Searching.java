@@ -1,24 +1,68 @@
 package algorithms;
 
 import model.Book;
+import structures.ArrayList.ArrayList; // dùng cụ thể ArrayList
 
 public class Searching {
-    public static int linearSearch(Book[] books, String title) {
-        for (int i = 0; i < books.length; i++) {
-            if (books[i].title.equalsIgnoreCase(title)) return i;
+
+    // Linear Search: partial match (case-insensitive)
+    public static void linearSearch(ArrayList<Book> books, String title) {
+        boolean found = false;
+        System.out.println("\n🔍 [Linear Search] Searching for '" + title + "'...");
+        for (int i = 0; i < books.size(); i++) {
+            Book book = books.get(i);
+            if (book.title.toLowerCase().contains(title.toLowerCase())) {
+                System.out.println("✅ Found at index " + i + ": " + book);
+                found = true;
+            }
         }
-        return -1;
+        if (!found) {
+            System.out.println("❌ Book '" + title + "' not found.");
+        }
+        System.out.println("🔎 Search complete.");
     }
 
-    public static int binarySearch(Book[] books, String title) {
-        int low = 0, high = books.length - 1;
+    // Binary Search (exact match, assumes sorted by title)
+    public static void binarySearchAll(ArrayList<Book> books, String title) {
+        int low = 0, high = books.size() - 1;
+        boolean found = false;
+
+        System.out.println("\n🔍 [Binary Search] Searching for '" + title + "'...");
+
         while (low <= high) {
             int mid = (low + high) / 2;
-            int cmp = books[mid].title.compareToIgnoreCase(title);
-            if (cmp == 0) return mid;
-            else if (cmp < 0) low = mid + 1;
-            else high = mid - 1;
+            Book midBook = books.get(mid);
+            int cmp = midBook.title.compareToIgnoreCase(title);
+
+            if (cmp == 0) {
+                found = true;
+                System.out.println("✅ Found at index " + mid + ": " + midBook);
+
+                // Left duplicates
+                int left = mid - 1;
+                while (left >= 0 && books.get(left).title.equalsIgnoreCase(title)) {
+                    System.out.println("✅ Found at index " + left + ": " + books.get(left));
+                    left--;
+                }
+
+                // Right duplicates
+                int right = mid + 1;
+                while (right < books.size() && books.get(right).title.equalsIgnoreCase(title)) {
+                    System.out.println("✅ Found at index " + right + ": " + books.get(right));
+                    right++;
+                }
+
+                break;
+            } else if (cmp < 0) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
         }
-        return -1;
+
+        if (!found) {
+            System.out.println("❌ Book '" + title + "' not found.");
+        }
+        System.out.println("🔎 Search complete.");
     }
 }

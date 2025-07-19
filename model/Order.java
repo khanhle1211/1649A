@@ -1,11 +1,13 @@
 package model;
 
+import structures.ArrayList.ArrayList;
+
 public class Order {
     public String customerName;
     public String shippingAddress;
-    public Book[] books;
+    public ArrayList<Book> books;
 
-    public Order(String customerName, String shippingAddress, Book[] books) {
+    public Order(String customerName, String shippingAddress, ArrayList<Book> books) {
         this.customerName = customerName;
         this.shippingAddress = shippingAddress;
         this.books = books;
@@ -13,12 +15,12 @@ public class Order {
 
     @Override
     public String toString() {
-        String result = "Customer: " + customerName + ", Address: " + shippingAddress + ", Books: [";
-        for (int i = 0; i < books.length; i++) {
-            result += books[i].toString();
-            if (i < books.length - 1) result += ", ";
+        StringBuilder result = new StringBuilder("Customer: " + customerName + ", Address: " + shippingAddress + ", Books: [");
+        for (int i = 0; i < books.size(); i++) {
+            result.append(books.get(i));
+            if (i < books.size() - 1) result.append(", ");
         }
-        result += "]";
-        return result;
+        result.append("]");
+        return result.toString();
     }
 }
