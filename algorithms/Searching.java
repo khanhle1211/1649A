@@ -32,7 +32,7 @@ public class Searching {
         while (low <= high) {
             int mid = (low + high) / 2;
             Book midBook = books.get(mid);
-            int cmp = midBook.title.compareToIgnoreCase(title);
+            int cmp = midBook.title.compareToIgnoreCase(title.trim());
 
             if (cmp == 0) {
                 found = true;

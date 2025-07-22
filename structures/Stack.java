@@ -1,31 +1,31 @@
 package structures;
 
-public class Stack<T> {
-    private static class Node<T> {
-        T data;
-        Node<T> next;
-        Node(T data) { this.data = data; }
+public class Stack<E> {
+    private static class Node<E> {
+        E data;
+        Node<E> next;
+        Node(E data) { this.data = data; }
     }
 
-    private Node<T> top = null;
+    private Node<E> top = null;
     private int size = 0;
 
-    public void push(T item) {
-        Node<T> node = new Node<>(item);
+    public void push(E item) {
+        Node<E> node = new Node<>(item);
         node.next = top;
         top = node;
         size++;
     }
 
-    public T pop() {
+    public E pop() {
         if (top == null) return null;
-        T data = top.data;
+        E data = top.data;
         top = top.next;
         size--;
         return data;
     }
 
-    public T peek() {
+    public E peek() {
         return top != null ? top.data : null;
     }
 
