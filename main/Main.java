@@ -220,7 +220,7 @@ public class Main {
                     smallList.add(new Book("B", "Author3", 1));
 
                     ArrayList<Book> largeList = new ArrayList<>();
-                    for (int i = 1000; i >= 1; i--) {
+                    for (int i = 60; i >= 1; i--) {
                         largeList.add(new Book("Book " + i, "Author" + i, i));
                     }
 
@@ -238,7 +238,7 @@ public class Main {
 
                     System.out.println("📊 Execution Time:");
                     System.out.println(" - Small list (3 items): " + timeSmall + " ms");
-                    System.out.println(" - Large list (1000 items): " + timeLarge + " ms");
+                    System.out.println(" - Large list (60 items): " + timeLarge + " ms");
                 }
 
                 default -> System.out.println("❌ Invalid choice. Try again.");

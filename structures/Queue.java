@@ -42,7 +42,7 @@ public class Queue<E> {
         return (head == null) ? null : head.data;
     }
 
-    // Check if queue is empty
+    // Check if the Queue is empty
     public boolean isEmpty() {
         return size == 0;
     }
@@ -52,7 +52,7 @@ public class Queue<E> {
         return size;
     }
 
-    // Access element at index position
+    // Access elements at index position
     public E get(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index " + index + " out of bounds");
