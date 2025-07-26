@@ -79,16 +79,19 @@ public class Main {
         Queue<Order> orderQueue = new Queue<>();
         ArrayList<Book> lastProcessedBooks = null;
         initializeLibrary();
+        ArrayList<Order> processedOrders = new ArrayList<>();
+
 
         while (true) {
-            System.out.println("\n=== Online Bookstore System ===");
             System.out.println("1. Place New Order");
             System.out.println("2. Process Orders");
             System.out.println("3. Search Book");
             System.out.println("4. Exit System");
             System.out.println("5. View Book Library");
             System.out.println("6. Benchmark Sorting Performance");
-            System.out.print("Enter your choice (1-6): ");
+            System.out.println("7. View Pending Orders");
+            System.out.println("8. Search Orders by Customer Name");
+            System.out.print("Enter your choice (1-8): ");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -145,45 +148,79 @@ public class Main {
                     if (orderQueue.isEmpty()) {
                         System.out.println("⚠️ No orders to process.");
                     } else {
+                        boolean found = false;
+
                         for (int i = 0; i < orderQueue.size(); i++) {
                             Order order = orderQueue.get(i);
-                            System.out.println("======================================");
-                            System.out.println("📦 Processing Order for " + order.customerName + ":");
-                            System.out.println(order);
+                            if (!processedOrders.contains(order)) {
+                                // Xử lý đơn này
+                                System.out.println("======================================");
+                                System.out.println("📦 Processing Order for " + order.customerName + ":");
+                                System.out.println(order);
 
-                            System.out.println("\n📚 Books before sorting:");
-                            for (int j = 0; j < order.books.size(); j++) {
-                                System.out.println(" - " + order.books.get(j));
+                                System.out.println("\n📚 Books before sorting:");
+                                for (int j = 0; j < order.books.size(); j++) {
+                                    Book book = order.books.get(j);
+                                    System.out.println(" - " + book);
+                                }
+
+
+                                System.out.println("\n🔀 [Quick Sort] Sorting books by title...");
+                                long start = System.nanoTime();
+                                Sorting.sort(order.books);  // Quick Sort
+                                long end = System.nanoTime();
+                                long duration = (end - start) / 1_000_000;
+
+                                for (int j = 0; j < order.books.size(); j++) {
+                                    Book book = order.books.get(j);
+                                    System.out.println(" - " + book);
+                                }
+
+                                System.out.println("✅ Sorting done in " + duration + " ms.");
+
+                                lastProcessedBooks = order.books;
+                                processedOrders.add(order);
+
+                                System.out.println("======================================\n");
+                                found = true;
+                                break; // ✅ Chỉ xử lý 1 đơn
                             }
-
-                            System.out.println("\n🔀 [Quick Sort] Sorting books by title...");
-                            long start = System.nanoTime();
-                            Sorting.sort(order.books);  // Quick Sort
-                            long end = System.nanoTime();
-                            long duration = (end - start) / 1_000_000;
-
-                            for (int j = 0; j < order.books.size(); j++) {
-                                System.out.println(" - " + order.books.get(j));
-                            }
-                            System.out.println("✅ Sorting done in " + duration + " ms.");
-
-                            lastProcessedBooks = order.books;
-
-                            System.out.println("======================================\n");
                         }
-                        System.out.println("✅ Orders processed.");
+
+                        if (!found) {
+                            System.out.println("✅ No unprocessed orders.");
+                        }
                     }
                 }
 
+
+
                 case 3 -> {
-                    if (lastProcessedBooks == null || lastProcessedBooks.isEmpty()) {
-                        System.out.println("⚠️ No processed books to search. Please process orders first.");
+                    System.out.println("Choose search source:");
+                    System.out.println("1. Last Processed Order");
+                    System.out.println("2. Entire Library");
+                    System.out.print("Enter your choice (1-2): ");
+                    int sourceChoice = scanner.nextInt();
+                    scanner.nextLine(); // Clear newline
+
+                    ArrayList<Book> searchList = null;
+
+                    if (sourceChoice == 1) {
+                        if (lastProcessedBooks == null || lastProcessedBooks.isEmpty()) {
+                            System.out.println("⚠️ No processed books to search. Please process orders first.");
+                            continue;
+                        }
+                        searchList = lastProcessedBooks;
+                    } else if (sourceChoice == 2) {
+                        searchList = bookLibrary;
+                    } else {
+                        System.out.println("❌ Invalid source choice.");
                         continue;
                     }
 
                     System.out.println("Choose search method:");
                     System.out.println("1. Linear Search");
-                    System.out.println("2. Binary Search");
+                    System.out.println("2. Binary Search (sorted required)");
                     System.out.print("Enter your choice (1-2): ");
                     int searchChoice = scanner.nextInt();
                     scanner.nextLine();
@@ -192,13 +229,15 @@ public class Main {
                     String searchTitle = scanner.nextLine();
 
                     if (searchChoice == 1) {
-                        Searching.linearSearch(lastProcessedBooks, searchTitle);
+                        Searching.linearSearch(searchList, searchTitle);
                     } else if (searchChoice == 2) {
-                        Searching.binarySearchAll(lastProcessedBooks, searchTitle);
+                        Sorting.sort(searchList); // Ensure it's sorted before binary search
+                        Searching.binarySearchAll(searchList, searchTitle);
                     } else {
                         System.out.println("❌ Invalid search choice.");
                     }
                 }
+
 
                 case 4 -> {
                     System.out.println("👋 Exiting system. Goodbye!");
@@ -240,9 +279,58 @@ public class Main {
                     System.out.println(" - Small list (3 items): " + timeSmall + " ms");
                     System.out.println(" - Large list (1000 items): " + timeLarge + " ms");
                 }
-
                 default -> System.out.println("❌ Invalid choice. Try again.");
+
+                case 7 -> {
+                    if (orderQueue.isEmpty()) {
+                        System.out.println("⚠️ No orders in queue.");
+                    } else {
+                        System.out.println("\n📋 Unprocessed Orders:");
+                        boolean found = false;
+
+                        for (int i = 0; i < orderQueue.size(); i++) {
+                            Order order = orderQueue.get(i);
+                            if (!processedOrders.contains(order)) {
+                                found = true;
+                                System.out.println(" - Order for: " + order.customerName);
+                                System.out.println(order);
+                                System.out.println("------------------------");
+                            }
+                        }
+
+                        if (!found) {
+                            System.out.println("✅ No unprocessed orders.");
+                        }
+                    }
+                }
+
+
+
+                case 8 -> {
+                    if (orderQueue.isEmpty()) {
+                        System.out.println("⚠️ No pending orders to search.");
+                    } else {
+                        System.out.print("🔍 Enter customer name to search: ");
+                        String searchName = scanner.nextLine().toLowerCase();
+                        boolean found = false;
+
+                        for (int i = 0; i < orderQueue.size(); i++) {
+                            Order order = orderQueue.get(i);
+                            if (order.customerName.toLowerCase().contains(searchName)) {
+                                System.out.println("\n✅ Found Order:");
+                                System.out.println(order);
+                                found = true;
+                            }
+                        }
+
+                        if (!found) {
+                            System.out.println("❌ No orders found for: " + searchName);
+                        }
+                    }
+                }
+
             }
+
         }
     }
 }
